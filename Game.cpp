@@ -1,7 +1,5 @@
 #include <iostream>
 #include <cstdlib>
-#include <string>
-
 using namespace std;
 int RandomNumber(int from, int to)
 {
@@ -9,357 +7,265 @@ int RandomNumber(int from, int to)
 	return randNum;
 
 }
-enum finalreslt { pass = 1, faile = 2 };
-enum levels { easy = 1, mid = 2, hard = 3, mixerr = 4 };
-enum opretation { add = 1, sub = 2, mul = 3, dive = 4, mixer = 5 };
-
-string getoptypesymbol(opretation optype)
+enum enumchoise { Stoen = 1, Paper = 2, Scissor = 3 };
+enum enumwinner { plyer = 1, compouter = 2, drow = 3 };
+struct stgamerslt
 {
-	switch (optype)
+	short gameround = 0;
+	short play1wintimes = 0;
+	short computerwintimes = 0;
+	short drawtimes = 0;
+	enumwinner gamewinner;
+	string winnername;
+
+};
+struct stroundinfo
+{
+	short roundnumber = 0;
+	enumchoise playerchoise;
+	enumchoise compiterchoise;
+	enumwinner winner;
+	string winnername;
+
+};
+enumchoise readplaychois()
+{
+	short choise = 1;
+	do
 	{
-	case opretation::add:
-		return "+";
+		cout << "\nyour choise : [1]:stone , [2]:paper , [3]:scissors ? ";
+		cin >> choise;
 
-	case opretation::sub:
-		return "-";
 
-	case opretation::mul:
-		return "*";
+	} while (choise < 1 || choise > 3);
 
-	case opretation::dive:
-		return "/";
-	default:
-		return "mix";
-	}
+	return enumchoise(choise);
 }
-
-
-string getQuestionlevel(levels questionlevel)
+enumchoise getcomputerchoie()
 {
-	string arrquestiotext[4] = { " easy ", "mid", "hard", "mixerr" };
-	return arrquestiotext[questionlevel - 1];
+
+	return enumchoise(RandomNumber(1, 3));
+
 }
-
-
-void setscreenColor(bool  rigth)
+string choise(enumchoise chois)
 {
-	if (rigth)
+	string arrchoisess[3] = { "stone","paper","scissors" };
+	return arrchoisess[chois - 1];
+
+}
+void setwinnerscreencolor(enumwinner winner)
+{
+	switch (winner)
+	{
+	case enumwinner::plyer:
 		system("color 2f");
-	else
+		break;
+	case enumwinner::compouter:
+		system("color 4f");
+		cout << "\a";
+		break;
+	default:
+		system("color 6f");
+		break;
+	}
+
+}
+/* or cilor function*********
+void colorfunction(stroundinfo roundinfo)
+{
+
+	if (roundinfo.playerchoise == roundinfo.winner)
+	{
+		system("color 2f");
+		cout << "\a";
+	}
+	if (roundinfo.compiterchoise == roundinfo.winner)
 	{
 		system("color 4f");
 		cout << "\a";
 	}
-
+	if (roundinfo.compiterchoise == roundinfo.playerchoise)
+	{
+		system("color 6f");
+	}
 }
-
-short readtheQuestion()
-{
-	int Question;
-	cout << "how mony Question do you want answer ?\n";
-	cin >> Question;
-
-	return Question;
-
-}
-
-levels ReadQuestionlevels()
+*/
+void preintroundreslt(stroundinfo roundinfo)
 {
 
-	short questionlevels = 0;
+	cout << "\n__roud [" << roundinfo.roundnumber << "]--------------\n\n";
+	cout << "player choise " << choise(roundinfo.playerchoise) << endl;
+	cout << "player choise " << choise(roundinfo.compiterchoise) << endl;
+	cout << "round winner : [ " << roundinfo.winnername << "]" << endl;
+	cout << "------------------------------------------\n " << endl;
+
+	setwinnerscreencolor(roundinfo.winner);
+
+}
+string  winnername(enumwinner winner)
+{
+	string winnernamearray[3] = { "player" ," computer " , "no wwiner" };
+
+	return winnernamearray[winner - 1];
+
+
+}
+enumwinner whowonthegame(short playerwintiem, short computer)
+{
+	if (playerwintiem > computer)
+		return enumwinner::plyer;
+	else if (computer < playerwintiem)
+		return enumwinner::compouter;
+	else
+		return enumwinner::drow;
+}
+enumwinner whowontheround(stroundinfo roundinfo)
+{
+	if (roundinfo.playerchoise == roundinfo.compiterchoise)
+	{
+		return enumwinner::drow;
+	}
+
+	switch (roundinfo.playerchoise)
+	{
+	case enumchoise::Stoen:
+		if (roundinfo.compiterchoise == enumchoise::Paper)
+		{
+			return  enumwinner::compouter;
+		}
+		break;
+	case enumchoise::Paper:
+		if (roundinfo.compiterchoise == enumchoise::Scissor)
+		{
+			return  enumwinner::compouter;
+		}
+		break;
+
+	case enumchoise::Scissor:
+		if (roundinfo.compiterchoise == enumchoise::Stoen)
+		{
+			return  enumwinner::compouter;
+		}
+		break;
+	}
+
+	return enumwinner::plyer;
+}
+stgamerslt fillgamereslt(int Gameround, short playerwintimes, short compute, short drawtimes)
+{
+	stgamerslt gameReaslt;
+
+	gameReaslt.gameround = Gameround;
+	gameReaslt.play1wintimes = playerwintimes;
+	gameReaslt.computerwintimes = compute;
+	gameReaslt.drawtimes = drawtimes;
+	gameReaslt.gamewinner = whowonthegame(playerwintimes, compute);
+	gameReaslt.winnername = winnername(gameReaslt.gamewinner);
+	return gameReaslt;
+}
+stgamerslt palygame(short howMonyrouds)
+{
+	stroundinfo roundinfo;
+	short play1wintimes = 0, computerwintimes = 0, drawtimes = 0;
+
+	for (short gameround = 1; gameround <= howMonyrouds; gameround++)
+	{
+		cout << "\nround [" << gameround << "] begins:\n";
+
+		roundinfo.roundnumber = gameround;
+		roundinfo.playerchoise = readplaychois();
+		roundinfo.compiterchoise = getcomputerchoie();
+		roundinfo.winner = whowontheround(roundinfo);
+		roundinfo.winnername = winnername(roundinfo.winner);
+
+
+		if (roundinfo.winner == enumwinner::plyer)
+			play1wintimes++;
+		else if (roundinfo.winner == enumwinner::compouter)
+			computerwintimes++;
+		else
+			drawtimes++;
+
+		preintroundreslt(roundinfo);
+
+	}
+
+	return fillgamereslt(howMonyrouds, play1wintimes, computerwintimes, drawtimes);
+}
+string tape(short num)
+{
+	string t = "";
+	for (int i = 1;i < num; i++)
+	{
+		t = t + "\t";
+		cout << t;
+	}
+	return t;
+
+}
+void showgameoverscreen()
+{
+	cout << tape(2) << "---------------------------------------------------------\n\n";
+	cout << tape(2) << "                ++++++Game Over+++++                      \n\n";
+	cout << tape(2) << "---------------------------------------------------------\n\n";
+
+
+
+}
+void showfinalgamereslt(stgamerslt Gamereslt)
+{
+	cout << tape(2) << "-------------------------[Game reslt]-----------------------\n\n";
+	cout << tape(2) << "round                : " << Gamereslt.gameround << endl;
+	cout << tape(2) << "player won times     : " << Gamereslt.play1wintimes << endl;
+	cout << tape(2) << "computer won times   : " << Gamereslt.computerwintimes << endl;
+	cout << tape(2) << "draw times           : " << Gamereslt.drawtimes << endl;
+	cout << tape(2) << "final winner         : " << Gamereslt.winnername << endl;
+	cout << tape(2) << "round         : " << Gamereslt.gameround << endl;
+
+
+
+}
+void restscreen()
+{
+
+	system("cls");
+	system("color 0F");
+}
+short readhowmonyround()
+{
+	short gameround = 1;
 	do
 	{
-		cout << "enter the level [1] easy , [2] med , [3] hared , [4] mix ? ";
-		cin >> questionlevels;
-	} while (questionlevels < 1 || questionlevels > 4);
+		cout << "how mony rounds 1 to 10 ? \n";
+		cin >> gameround;
 
-	return levels(questionlevels);
-}
+	} while (gameround < 1 || gameround > 10);
 
-opretation Readoptype()
-{
-
-	short optype;
-	cout << "enter the operation [1] add , [2] sub , [3] mul , [4] div , [5] mix  ?\n";
-	cin >> optype;
-	return opretation(optype);
+	return gameround;
 
 }
-
-struct stQuestion
-{
-	int number1 = 0;
-	int number2 = 0;
-	opretation operation;
-	levels questinlevel;
-	int correctanswer = 0;
-	int playeranswer = 0;
-	bool Answerreaslt = false;
-};
-struct stQuizz
-{
-
-	stQuestion Questionlist[100];
-	short numberofquestion;
-	levels levelgame;
-	opretation op;
-	int numberofwronganswer = 0;
-	int numberofrigthanswer = 0;
-	bool ispasse = false;
-};
-
-int simplecalculat(int num1, int num2, opretation op)
-{
-
-	switch (op)
-	{
-	case opretation::add:
-		return num1 + num2;
-
-	case opretation::sub:
-		return num1 - num2;
-
-	case opretation::mul:
-		return num1 * num2;
-
-	case opretation::dive:
-		return num1 / num2;
-
-	default:
-		return num1 + num2;
-	}
-}
-opretation Getrandomoperationtype()
-{
-	int op = RandomNumber(1, 4);
-	return (opretation)op;
-
-
-}
-
-int readthemonyQuestion()
-{
-	int Question;
-	cout << "how mony Question do you want answer ?\n";
-	cin >> Question;
-
-	return Question;
-
-}
-
-
-stQuestion GenaratQuestion(levels Questinlevel, opretation optype)
-{
-
-	stQuestion Question;
-
-	if (Questinlevel == levels::mixerr)
-	{
-		Questinlevel = (levels)RandomNumber(1, 3);
-	}
-
-	if (optype == opretation::mixer)
-	{
-		optype = Getrandomoperationtype();
-	}
-
-
-
-	Question.operation = optype;
-
-	switch (Questinlevel)
-	{
-
-	case levels::easy:
-		Question.number1 = RandomNumber(1, 10);
-		Question.number2 = RandomNumber(1, 10);
-
-
-		Question.correctanswer = simplecalculat(Question.number1, Question.number2, Question.operation);
-		Question.questinlevel = Questinlevel;
-		return Question;
-
-	case levels::mid:
-		Question.number1 = RandomNumber(10, 50);
-		Question.number2 = RandomNumber(10, 50);
-
-
-		Question.correctanswer = simplecalculat(Question.number1, Question.number2, Question.operation);
-		Question.questinlevel = Questinlevel;
-		return Question;
-
-	case levels::hard:
-		Question.number1 = RandomNumber(50, 100);
-		Question.number2 = RandomNumber(50, 100);
-
-
-		Question.correctanswer = simplecalculat(Question.number1, Question.number2, Question.operation);
-		Question.questinlevel = Questinlevel;
-		return Question;
-
-
-	case levels::mixerr:
-		Question.number1 = RandomNumber(50, 100);
-		Question.number2 = RandomNumber(50, 100);
-
-
-		Question.correctanswer = simplecalculat(Question.number1, Question.number2, Question.operation);
-		Question.questinlevel = Questinlevel;
-		return Question;
-	}
-	return Question;
-
-}
-void Genaratequestion(stQuizz& Quizz)
-{
-
-
-	for (short question = 0; question < Quizz.numberofquestion; question++)
-	{
-		Quizz.Questionlist[question] = GenaratQuestion(Quizz.levelgame, Quizz.op);
-
-
-	}
-}
-
-int ReadquestionAnswer()
-{
-	int answer = 0;
-	cin >> answer;
-	return answer;
-
-
-}
-
-
-void printtheQuestion(stQuizz& Quizz, short questionnuber)
-{
-
-	cout << "\n";
-	cout << "Question [" << questionnuber + 1 << "/" << Quizz.numberofquestion << "] \n\n";
-	cout << Quizz.Questionlist[questionnuber].number1 << endl;
-	cout << Quizz.Questionlist[questionnuber].number2 << " ";
-	cout << getoptypesymbol(Quizz.Questionlist[questionnuber].operation);
-	cout << "\n_" << endl;
-
-
-}
-
-void CorrecttheQuestionAnswer(stQuizz& Quizz, short questionnuber)
-{
-
-
-	if (Quizz.Questionlist[questionnuber].playeranswer != Quizz.Questionlist[questionnuber].correctanswer)
-	{
-		Quizz.Questionlist[questionnuber].Answerreaslt = false;
-		Quizz.numberofwronganswer++;
-
-
-		cout << "Worng Answer :-( \n";
-		cout << "The right answer is: ";
-		cout << Quizz.Questionlist[questionnuber].correctanswer;
-		cout << "\n";
-
-
-	}
-	else
-	{
-		Quizz.Questionlist[questionnuber].Answerreaslt = true;
-		Quizz.numberofrigthanswer++;
-		cout << "right answer ";
-	}
-
-	cout << endl;
-	setscreenColor(Quizz.Questionlist[questionnuber].Answerreaslt);
-
-}
-
-
-
-void AskAndcorretQuestionAnswer(stQuizz& Quizz)
-{
-
-	for (short questionnumber = 0; questionnumber < Quizz.numberofquestion;questionnumber++)
-	{
-
-		printtheQuestion(Quizz, questionnumber);
-
-		Quizz.Questionlist[questionnumber].playeranswer = ReadquestionAnswer();
-
-		CorrecttheQuestionAnswer(Quizz, questionnumber);
-
-	}
-
-	Quizz.ispasse = (Quizz.numberofrigthanswer >= Quizz.numberofwronganswer);
-
-
-}
-
-string getfinalreslts(bool  pass)
-{
-	if (pass)
-		return "pass :-)";
-	else
-		return "fial :-(";
-
-}
-void printQuizzResultst(stQuizz Quizz)
-{
-
-	cout << "\n";
-	cout << "\n----------------------------\n";
-	cout << " Final Resutls is " << getfinalreslts(Quizz.ispasse);
-	cout << "\n--------------------------------------_\n\n";
-	cout << "Number of Questions: " << Quizz.numberofquestion << endl;
-	cout << "Questions Level    : " << getQuestionlevel(Quizz.levelgame) << endl;
-	cout << "OpType             : " << getoptypesymbol(Quizz.op) << endl;
-	cout << "Number of Right Answers: " << Quizz.numberofrigthanswer << endl;
-	cout << "Number of Wrong Answers: " << Quizz.numberofwronganswer << endl;
-	cout << "------------------------------------_\n";
-
-
-
-}
-void playgammath()
-{
-	stQuizz Quizz;
-
-	Quizz.numberofquestion = readthemonyQuestion();
-	Quizz.levelgame = ReadQuestionlevels();
-	Quizz.op = Readoptype();
-
-
-	Genaratequestion(Quizz);
-	AskAndcorretQuestionAnswer(Quizz);
-	printQuizzResultst(Quizz);
-}
-
-void resetscrean()
-{
-	system("cls");
-	system("color 0f");
-
-
-}
-
-void startGame()
+void startsgame()
 {
 
 	char playagain = 'Y';
 
 	do
 	{
-		resetscrean();
-		playgammath();
-
-
-		cout << "\n" << "do you want to play again Y/N ? ";
+		restscreen();
+		stgamerslt gamereslt = palygame(readhowmonyround());
+		showgameoverscreen();
+		showfinalgamereslt(gamereslt);
+		cout << endl << tape(3) << "do you want play again ? Y/N ";
 		cin >> playagain;
-
 	} while (playagain == 'Y' || playagain == 'y');
+
 }
 int main()
 {
-	startGame();
+
+	startsgame();
+
 	return 0;
+
+
 }
